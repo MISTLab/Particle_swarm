@@ -11,6 +11,6 @@ set -e
 # WORKER=${2}
 # SEED=${3}
 
-# docker run -it vivekshankarv/hir_benchmark:arm64 exp ${1} ${2} ${3} 
+# docker run -it vivekshankarv/hir_benchmark:arm64 run_exp ${1} ${2} ${3} 
 
-singularity run -B /scratch /home/viveks/scratch/Hir/hir.sif exp ${1} ${2} ${3} 
+singularity run -B /scratch /home/viveks/scratch/Hir/hir.sif run_exp ${1} ${2} ${3} 

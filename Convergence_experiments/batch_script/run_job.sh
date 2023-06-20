@@ -53,7 +53,8 @@ cd ${WORKDIR}
 # Set up experiment file
 sed -e "s|RANDOMSEED|${RANDOMSEED}|g" \
     -e "s|NUMBER_OF_GUIDE_ROBOTS|${NUMBER_OF_GUIDE_ROBOTS}|g" \
-    -e "s|NUMBER_OF_WORKER_ROBOTS|${NUMBER_OF_WORKER_ROBOTS}|g"
+    -e "s|NUMBER_OF_WORKER_ROBOTS|${NUMBER_OF_WORKER_ROBOTS}|g" \
+    -e "s|OUT_FILE_NAME|${OUTFILE}|g" \
     ${HOMEDIR}/experiments/template.argos > ${EXPERIMENT}
 
 
