@@ -1,0 +1,18 @@
+function abc(x,y){
+	
+	log("a")
+}
+
+function init(){
+
+}
+
+function step(){
+	if(pose.position.z < 0.5){
+        gotoabs3d(0.0,0.0,0.5)
+    }
+    else{
+        goto3d(10,0.0,0.0)
+    }
+
+}
