@@ -1,8 +1,5 @@
 #include <argos3/core/simulator/loop_functions.h>
 #include <argos3/plugins/robots/kheperaiv/control_interface/buzz_controller_kheperaiv.h>
-#include "ros_controller/src/controller/controller.h"
-#include "ros_controller/src/controller/controller_footbot.h"
-#include "ros_controller/src/controller/controller_spiri.h"
 // #include <buzz/argos/buzz_controller_spiri.h>
 #include <argos3/plugins/robots/kheperaiv/simulator/kheperaiv_entity.h>
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
@@ -38,6 +35,9 @@ private:
 
    void CloseFile(std::ofstream& c_stream);
 
+   void PlaceGuide(int num_guide, int num_worker, float density);
+
+   void PlaceWorker(int num, float density);
 
    void Hir_PostStep();
 

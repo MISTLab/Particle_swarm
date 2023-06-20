@@ -62,8 +62,8 @@ link_directories(${ARGOS_LIBRARY_DIRS} ${BUZZ_LIBRARY_DIRS})
 # Compile target
 
 
-add_library(planhing_lf SHARED planning.h planning.cpp)
-target_link_libraries(planhing_lf
+add_library(planning_lf SHARED Planning.h Planning.cpp)
+target_link_libraries(planning_lf
   buzz
   argos3core_simulator
   argos3plugin_simulator_dynamics2d
@@ -76,4 +76,4 @@ target_link_libraries(planhing_lf
 
 
 # Install stuff
-install(TARGETS planhing_lf DESTINATION ${ARGOS_PREFIX}/lib/argos3)
+install(TARGETS planning_lf DESTINATION ${ARGOS_PREFIX}/lib/argos3)
