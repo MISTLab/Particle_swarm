@@ -1,0 +1,101 @@
+<?xml version="1.0" ?>
+<argos-configuration>
+
+  <!-- ************************* -->
+  <!-- * General configuration * -->
+  <!-- ************************* -->
+  <framework>
+    <system threads="2" />
+    <experiment length="0"
+                ticks_per_second="25"
+                random_seed="124" />
+  </framework>
+
+  <!-- *************** -->
+  <!-- * Controllers * -->
+  <!-- *************** -->
+  <controllers>
+
+    <buzz_controller_footbot id="khivbs">
+        <actuators>
+        <differential_steering implementation="default" />
+        <leds                  implementation="default" medium="leds" />
+        <range_and_bearing     implementation="default" />
+        </actuators>
+        <sensors>
+        <!-- <footbot_ground     implementation="rot_z_only" /> -->
+        <footbot_proximity  implementation="default" show_rays="false" />
+        <!-- <footbot_light      implementation="rot_z_only" show_rays="false" /> -->
+        <!-- <footbot_ultrasound implementation="default" show_rays="false" /> -->
+        <!-- <footbot_lidar      implementation="default" show_rays="false" /> -->
+        <range_and_bearing    implementation="medium" medium="rab" show_rays="false" noise_std_dev="0" />
+        <positioning          implementation="default" />
+        </sensors>
+       <params bytecode_file="buzz_scripts/SheepStructuring.bo"
+              debug_file="buzz_scripts/SheepStructuring.bdb" 
+        >
+        <wheel_turning hard_turn_angle_threshold="90"
+                       soft_turn_angle_threshold="70"
+                       no_turn_angle_threshold="0"
+                       max_speed="10" />
+        </params>
+    </buzz_controller_footbot>
+
+  </controllers>
+
+  <!-- ****************** -->
+  <!-- * Loop functions * -->
+  <!-- For Linux, use library="sample_loop_funcs/build/libexp_lf.so" -->
+  <!-- For MaxOSX, use library="sample_loop_funcs/build/libexp_lf.dylib" -->
+  <!-- ****************** -->
+  <loop_functions
+    library="loop_funcs/build/libexp_lf.dylib"
+    label="exp_lf"
+    outfile="exp_lf"
+    posfile="positions.csv"
+    data_size="100"
+    density="0.1"
+
+    shepherdMode="true"
+    sheep="5"
+    dogStartIdx="100"
+    isDogCluster="false"
+    dogs="10"
+
+    robots="20"
+    walls="true"
+    topology="cluster"
+  />
+  
+  <!-- *********************** -->
+  <!-- * Arena configuration * -->
+  <!-- *********************** -->
+  <arena size="30, 20, 5" center="0,0,2.5" />
+
+  <!-- ******************* -->
+  <!-- * Physics engines * -->
+  <!-- ******************* -->
+  <physics_engines>
+    <dynamics2d id="dyn2d" />
+    <!-- <pointmass3d id="pm3d" /> -->
+  </physics_engines>
+
+  <!-- ********* -->
+  <!-- * Media * -->
+  <!-- ********* -->
+  <media>
+    <range_and_bearing id="rab" check_occlusions="false" />
+    <led id="leds" />
+    <led id="light" />
+  </media> 
+
+  <!-- ****************** -->
+  <!-- * Visualization * -->
+  <!-- ****************** -->
+  <visualization>
+    <qt-opengl>
+      <user_functions label="buzz_qt" />
+    </qt-opengl>
+  </visualization>
+
+</argos-configuration>

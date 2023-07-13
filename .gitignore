@@ -1,0 +1,19 @@
+build/
+bin/
+lib/
+
+KheperaIV/ros_simulation/ros_ws/build/
+*/bin/
+*/lib/
+KheperaIV/ros_simulation/ros_ws/build/devel/
+KheperaIV/ros_simulation/ros_ws/.*
+## C++ Specific
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch

@@ -1,0 +1,285 @@
+<?xml version="1.0" ?>
+<argos-configuration>
+
+  <!-- ************************* -->
+  <!-- * General configuration * -->
+  <!-- ************************* -->
+  <framework>
+    <system threads="4" />
+    <experiment length="0"
+                ticks_per_second="10"
+                random_seed="5" />
+  </framework>
+
+  <!-- *************** -->
+  <!-- * Controllers * -->
+  <!-- *************** -->
+  <controllers>
+
+    <buzz_controller_kheperaiv id="khivbz" >
+        <actuators>
+        <differential_steering implementation="default" />
+        <leds                  implementation="default" medium="leds" />
+        <range_and_bearing     implementation="default" />
+        </actuators>
+        <sensors>
+        <!-- COMMENT THIS <kheperaiv_ground     implementation="rot_z_only" /> -->
+        <kheperaiv_proximity  implementation="default" show_rays="false" />
+        <kheperaiv_ultrasound implementation="default" show_rays="false" />
+        <kheperaiv_lidar      implementation="default" show_rays="false" />
+        <range_and_bearing    implementation="medium" medium="rab" show_rays="false" noise_std_dev="0" />
+        <positioning          implementation="default" />
+        </sensors>
+          <params
+                bytecode_file="../buzz_script/fun.bo"
+                debug_file="../buzz_script/fun.bdb">
+                <wheel_turning
+                hard_turn_angle_threshold="90"
+                soft_turn_angle_threshold="70"
+                no_turn_angle_threshold="0.5"
+                max_speed="50"/>
+
+          </params>
+      
+    </buzz_controller_kheperaiv>
+
+
+  </controllers>
+
+  <!-- ****************** -->
+  <!-- * Loop functions * -->
+  <!-- For Linux, use library="sample_loop_funcs/build/libexp_lf.so" -->
+  <!-- For MaxOSX, use library="sample_loop_funcs/build/libexp_lf.dylib" -->
+  <!-- ****************** -->
+
+  <loop_functions
+    library="/home/docker/Hir/KheperaIV/particle_swarm/Convergence_experiments/loop_function/build/libplanning_lf.so"
+    label="Convergence"
+    outfile="abc"
+    Num_guide="4"
+    Num_worker="5000"
+    density="0.5"
+  />
+  
+  <!-- *********************** -->
+  <!-- * Arena configuration * -->
+  <!-- *********************** -->
+  <arena size="110, 110, 5" center="0,0,2.5">
+
+
+
+
+    <!-- Distribute explorer robots -->
+<!-- 
+    <distribute>
+      <position method="grid"
+                center="1,-1.8,0"
+                distances="0.2,0.2,0"
+                layout="10,1,1" />
+      <orientation method="constant" values="0,0,0" />
+      <entity quantity="10" max_trials="1">
+        <kheperaiv id="kh120" rab_range="10" rab_data_size="500">
+        <controller config="khivbz" />
+    </kheperaiv>
+      </entity>
+    </distribute>
+
+   
+
+      <distribute>
+      <position method="grid"
+                center="1,1.8,0"
+                distances="0.2,0.2,0"
+                layout="10,1,1" />
+      <orientation method="constant" values="0,0,0" />
+      <entity quantity="10" max_trials="1">
+        <kheperaiv id="kh" rab_range="10" rab_data_size="500">
+        <controller config="khivbz" />
+    </kheperaiv>
+      </entity>
+    </distribute> -->
+
+    <!-- <distribute>
+      <position method="grid"
+                center="-1,1.8,0"
+                distances="0.2,0.2,0"
+                layout="10,1,1" />
+      <orientation method="constant" values="0,0,0" />
+      <entity quantity="5" max_trials="1">
+        <kheperaiv id="kh123" rab_range="10" rab_data_size="500">
+        <controller config="khivbz" />
+    </kheperaiv>
+      </entity>
+    </distribute> -->
+
+
+
+    <!-- <kheperaiv id="kh1200" rab_range="10" rab_data_size="500">
+      <body position="2,0,0" orientation="180,0,0" />
+      <controller config="khivbz" />
+    </kheperaiv>
+
+    <kheperaiv id="kh1201" rab_range="10" rab_data_size="500">
+      <body position="1.8,-1.8,0" orientation="180,0,0" />
+      <controller config="khivbz" />
+    </kheperaiv>
+
+    <kheperaiv id="kh1202" rab_range="10" rab_data_size="500">
+      <body position="0.0,-1.8,0" orientation="180,0,0" />
+      <controller config="khivbz" />
+    </kheperaiv>
+
+    <kheperaiv id="kh1203" rab_range="10" rab_data_size="500">
+      <body position="-1.8, -1.8,0" orientation="180,0,0" />
+      <controller config="khivbz" />
+    </kheperaiv>
+ -->
+     <!-- <kheperaiv id="kh1204" rab_range="10" rab_data_size="500">
+      <body position="-1.8,0,0" orientation="180,0,0" />
+      <controller config="khivbz" />
+    </kheperaiv>
+
+    <kheperaiv id="kh1205" rab_range="10" rab_data_size="500">
+      <body position="-1.5,1.5,0" orientation="180,0,0" />
+      <controller config="khivbz" />
+    </kheperaiv>
+
+    <kheperaiv id="kh1206" rab_range="10" rab_data_size="500">
+      <body position="0.0,1.5,0" orientation="180,0,0" />
+      <controller config="khivbz" />
+    </kheperaiv>
+
+    <kheperaiv id="kh1207" rab_range="10" rab_data_size="500">
+      <body position="1.5,1.5,0" orientation="180,0,0" />
+      <controller config="khivbz" />
+    </kheperaiv>
+
+    <kheperaiv id="kh1208" rab_range="10" rab_data_size="500">
+      <body position="2.7,1.5,0" orientation="180,0,0" />
+      <controller config="khivbz" />
+    </kheperaiv>
+
+    <kheperaiv id="kh1209" rab_range="10" rab_data_size="500">
+      <body position="2.7,0.0,0" orientation="180,0,0" />
+      <controller config="khivbz" />
+    </kheperaiv>
+
+    <kheperaiv id="kh1210" rab_range="10" rab_data_size="500">
+      <body position="2.7,-1.0,0" orientation="180,0,0" />
+      <controller config="khivbz" />
+    </kheperaiv> -->
+
+    <!-- <kheperaiv id="kh1211" rab_range="10" rab_data_size="500">
+      <body position="2.7,-1.5,0" orientation="180,0,0" />
+      <controller config="khivbz" />
+    </kheperaiv>
+
+    <kheperaiv id="kh1212" rab_range="10" rab_data_size="500">
+      <body position="2.7,-2.0,0" orientation="180,0,0" />
+      <controller config="khivbz" />
+    </kheperaiv>
+
+    <kheperaiv id="kh1213" rab_range="10" rab_data_size="500">
+      <body position="2,-2.0,0" orientation="180,0,0" />
+      <controller config="khivbz" />
+    </kheperaiv>
+
+    <kheperaiv id="kh1214" rab_range="10" rab_data_size="500">
+      <body position="1.5,-2.0,0" orientation="180,0,0" />
+      <controller config="khivbz" />
+    </kheperaiv>
+
+    <kheperaiv id="kh1215" rab_range="10" rab_data_size="500">
+      <body position="1,-2.0,0" orientation="180,0,0" />
+      <controller config="khivbz" />
+    </kheperaiv> -->
+
+    <!-- <kheperaiv id="kh1216" rab_range="10" rab_data_size="500">
+      <body position="0,-2.0,0" orientation="180,0,0" />
+      <controller config="khivbz" />
+    </kheperaiv> -->
+
+    <!-- <kheperaiv id="kh60" rab_range="10" rab_data_size="500">
+      <body position="2.7,-1.0,0" orientation="180,0,0" />
+      <controller config="khivbz" />
+    </kheperaiv>
+
+    <kheperaiv id="kh61" rab_range="10" rab_data_size="500">
+      <body position="2.7,-2.0,0" orientation="180,0,0" />
+      <controller config="khivbz" />
+    </kheperaiv>
+
+    <kheperaiv id="kh62" rab_range="10" rab_data_size="500">
+      <body position="2.0,-2.0,0" orientation="180,0,0" />
+      <controller config="khivbz" />
+    </kheperaiv>
+
+    <kheperaiv id="kh63" rab_range="10" rab_data_size="500">
+      <body position="1.5,-2.0,0" orientation="180,0,0" />
+      <controller config="khivbz" />
+    </kheperaiv>
+
+    <kheperaiv id="kh64" rab_range="10" rab_data_size="500">
+      <body position="1.0,-2.0,0" orientation="180,0,0" />
+      <controller config="khivbz" />
+    </kheperaiv>
+
+    <kheperaiv id="kh65" rab_range="10" rab_data_size="500">
+      <body position="0.5,-2.0,0" orientation="180,0,0" />
+      <controller config="khivbz" />
+    </kheperaiv>
+
+    <kheperaiv id="kh66" rab_range="10" rab_data_size="500">
+      <body position="0.0,-2.0,0" orientation="180,0,0" />
+      <controller config="khivbz" />
+    </kheperaiv>
+
+    <kheperaiv id="kh67" rab_range="10" rab_data_size="500">
+      <body position="-0.5,-2.0,0" orientation="180,0,0" />
+      <controller config="khivbz" />
+    </kheperaiv>
+
+    <kheperaiv id="kh68" rab_range="10" rab_data_size="500">
+      <body position="-1.0,-2.0,0" orientation="180,0,0" />
+      <controller config="khivbz" />
+    </kheperaiv>
+
+    <kheperaiv id="kh69" rab_range="10" rab_data_size="500">
+      <body position="-1.5,-2.0,0" orientation="180,0,0" />
+      <controller config="khivbz" />
+    </kheperaiv>
+
+    <kheperaiv id="kh70" rab_range="10" rab_data_size="500">
+      <body position="-2.0,-2.0,0" orientation="180,0,0" />
+      <controller config="khivbz" />
+    </kheperaiv> -->
+
+  </arena>
+
+  <!-- ******************* -->
+  <!-- * Physics engines * -->
+  <!-- ******************* -->
+  <physics_engines>
+    <dynamics2d id="dyn2d" />
+    <!-- <pointmass3d id="pm3d" /> -->
+
+  </physics_engines>
+
+  <!-- ********* -->
+  <!-- * Media * -->
+  <!-- ********* -->
+  <media>
+    <range_and_bearing id="rab" check_occlusions="false" />
+    <led id="leds" />
+  </media> 
+
+  <!-- ****************** -->
+  <!-- * Visualization * -->
+  <!-- ****************** -->
+  <visualization>
+    <!-- <qt-opengl>
+      <user_functions label="buzz_qt" />
+    </qt-opengl> -->
+  </visualization>
+
+</argos-configuration>

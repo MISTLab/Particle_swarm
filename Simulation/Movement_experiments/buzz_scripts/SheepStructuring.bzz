@@ -1,0 +1,199 @@
+# Sheep structure configuration and control
+# Currently setup for 'rigid mode' state in main script.
+
+include "includes/vec2.bzz"
+include "includes/Single_linkage.bzz"
+
+# Globals
+time = 0
+logStore = {}
+all = nil
+
+## Constants
+# Desired distance
+DESIRED_DIST = 100
+# TEMP: Using robot 100 and greater as dog, and rest as sheep.
+DOG = 100
+# Potential Constants
+LJ_TARGET = 150.0
+LJ_EPSILON = 150.0
+LJ_SCALE = 4.0
+LJ_POW = 2.0
+MORSE_ALPHA = 1.0/50.0
+MORSE_D = -10.0
+DESIRED_MORSE_DIST = 0
+MORSE_ALPHA2 = -1.0/200.0
+MORSE_D2 = 1000.0
+BUCK_A = 0.1
+BUCK_C = 1000.0
+BUCK_TARGET = 50.0 # sigma
+HARMON_A0 = 0.0
+HARMON_K = 1.0/50.0
+CUBIC_A0 = 0.0
+CUBIC_K = 1.0/1000.0
+
+function init() {
+  time = 0
+  logStore[id] = {}
+  all = swarm.create(1)
+  sheep = swarm.create(2)
+  dogs = swarm.create(3)
+  all.join()
+  sheep.select(id < DOG)
+  dogs.select(id >= DOG)
+}
+
+function step() {
+  time = time + 1
+  Accum = {
+    .x = 0.0,
+    .y = 0.0,
+    .error = 0.0
+  }
+
+  if (dogs.in()) {
+    # dog behaviour
+    goto(500.0, 0)
+  }
+  
+  if (sheep.in()) {
+    neighbors.foreach( function(rid, data) {
+      if (rid != DOG) {
+        # Draw vector to neighbor
+        var neighborVec = math.vec2.newp(data.distance, data.azimuth)
+        debug.rays.add(35,100,52, neighborVec.x/100, neighborVec.y/100, 0.0)
+
+        # Potential calculation
+        var potential = 0
+        # potential = (data.distance - DESIRED_DIST)
+        # potential = geMagnitude(data.distance, DESIRED_DIST)
+        # potential = ljMagnitudeExample(data.distance, LJ_TARGET, LJ_EPSILON, LJ_SCALE, LJ_POW)
+        # potential = ljMagnitude(data.distance, 0, LJ_TARGET, LJ_EPSILON, LJ_SCALE, LJ_POW)
+        # potential = morseMagnitude(data.distance, DESIRED_DIST, MORSE_ALPHA, MORSE_D)
+        # potential = morseMagnitude(data.distance, DESIRED_MORSE_DIST, MORSE_ALPHA2, MORSE_D2) # make interesting triangle
+        # potential = buckMagnitude(data.distance, 0, BUCK_TARGET, BUCK_A, BUCK_C)
+        potential = harmonMagnitude(data.distance, DESIRED_DIST, HARMON_A0, HARMON_K)
+        # potential = cubicMagnitude(data.distance, DESIRED_DIST, CUBIC_A0, CUBIC_K)
+
+        # Capping potentials to prevent constant movement # REVIEW
+        # if (math.abs(potential) < 50)
+        #   return nil
+        if (math.abs(potential) > 100000000000000000000.0)
+          potential = 100000000000000000000.0
+        # REVIEW this may not be the way we should accum factors as 'errors'
+        Accum.error = Accum.error + potential
+        # Initialize vector
+        var myVec = math.vec2.newp(data.distance, data.azimuth)
+
+        # REVIEW Accum strategy 1: Scale current vector by (signed) potential
+        # myVec = math.vec2.scale(myVec, potential)
+  
+        # REVIEW Accum strategy 1.5: Scale distance before plugging into vector
+        # myVec = math.vec2.newp(data.distance * potential, data.azimuth)
+
+        # REVIEW Accum Strategy 2: Take potential as vector. Same strategy as full ljCalculatePotential
+        myVec = math.vec2.newp(potential, data.azimuth)
+
+        # Debugging help
+        # log("link: ", id, "->", rid)
+        # log("potential ", potential, " neighbor vec ", neighborVec.x,",", neighborVec.y)
+        # log("calculated vec ", myVec.x,",", myVec.y)
+
+        # Add on the calculated vector
+        Accum.x = Accum.x + myVec.x
+        Accum.y = Accum.y + myVec.y
+      }
+    })
+    # Average, by number of values in Accum
+    if(neighbors.count() > 0)
+      math.vec2.scale(Accum, 1.0 / neighbors.count())
+
+
+    # Draw red lines and move towards new, total vector
+    debug.rays.add(255,0,0, Accum.x/100.0, Accum.y/100.0, 0.0)
+    goto(Accum.x, Accum.y)
+  }
+}
+
+function reset() {
+  # stub
+}
+
+
+### Structure position (potential) helpers
+
+## Gabriel Edge Potential
+
+# Old geCalculation, full method
+function geCalculatePotential(Accum) {
+	var error = (data.distance -  Nei_look_up[rid].distance)/data.distance
+	Accum.error = Accum.error + error
+	var my_vec = math.vec2.newp(data.distance, data.azimuth)
+	debug.rays.add(35,100,52, my_vec.x/100, my_vec.y/100, 0.0)
+	Accum.x= Accum.x + (error * my_vec.x)
+	Accum.y= Accum.y + (error * my_vec.y)
+}
+
+# Gabriel Edge magnitude
+function geMagnitude(dist, desiredDist) {
+  return (data.distance -  Nei_look_up[rid].distance)/data.distance
+}
+
+## Lennard-Jones Potential
+
+# Lennard-Jones interaction magnitude. Target (sigma) and epsilon are constants. 
+# From https://the.swarming.buzz/ICRA2017/listings/dispersion.bzz.html
+function ljMagnitudeExample(dist, target, epsilon, scale, pow) {
+  return - (epsilon / dist) * ((target / dist)^(2*pow) - (target / dist)^pow)
+}
+
+# Neighbor data to LJ interaction vector
+function ljVector(rid, data) {
+  return math.vec2.newp(ljMagnitudeExample(data.distance, LJ_TARGET, LJ_EPSILON, 4, 2), data.azimuth)
+}
+
+# Accumulator of neighbor LJ interactions
+function ljSum(rid, data, accum) {
+  return math.vec2.add(data, accum)
+}
+
+# Calculates and actuates the flocking interaction
+function ljCalculatePotential(given_neighbors) {
+  # Calculate accumulator
+  var accum = given_neighbors.map(ljVector).reduce(ljSum, math.vec2.new(0.0, 0.0))
+  if(neighbors.count() > 0)
+    math.vec2.scale(accum, 1.0 / neighbors.count())
+  return accum
+}
+
+# Lennard-Jones interaction magnitude. Target (sigma) and epsilon are constants.
+function ljMagnitude(dist, desiredDist, target, epsilon, scale, pow) {
+  return - epsilon * ((target / (dist - desiredDist))^(2*pow) - (target / (dist - desiredDist))^(pow))
+}
+
+
+## Morse Potential
+function morseMagnitude(dist, desiredDist, alpha, D) {
+  return D * math.exp(-2.0 * alpha * (dist - desiredDist)) - 2.0 * D * math.exp(-1 * alpha * (dist - desiredDist))
+}
+
+## Buckingham Potential
+function buckMagnitude(dist, desiredDist, target, A, C) {
+  return A * math.exp((dist - desiredDist) / target) - C * (target / (dist - desiredDist))^6
+}
+
+## Harmonic 'potential'
+function harmonMagnitude(dist, desiredDist, a0, k) {
+  # return a0 + 1/2 * k * (dist - desiredDist)^2
+
+  # extract sign to make negative when x-x0 < 0. -> more stay on outer edge than usual
+  return a0 + ((dist - desiredDist)/math.abs(dist - desiredDist)) * 1.0/2.0 * k * (dist - desiredDist)^2
+
+  # extract sign AND distort to make steeper below x0
+  # return a0 + ((dist - desiredDist)/math.abs(dist)) * 1/2 * k * (dist - desiredDist)^2
+}
+
+## Cubic 'potential'
+function cubicMagnitude(dist, desiredDist, a0, k) {
+  return a0 + 1.0/2.0 *  k * (dist - desiredDist)^3
+}

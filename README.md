@@ -1,92 +1,107 @@
 # Particle_Swarm
+This is the official code repository for the project Particle Swarm.
+The major portion of this repository contains the code for our simulation experiments, and we also provide links to the hardware code repository.
 
-
-
-## Getting started
-
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+# Citation
+When using the code from this repository, consider citing the associated paper: 
 
 ```
-cd existing_repo
-git remote add origin http://git.mistlab.ca/vvaradharajan/particle_swarm.git
-git branch -M main
-git push -uf origin main
+@article{varadharajan2022hierarchical,
+  title={Hierarchical control of smart particle swarms},
+  author={Varadharajan, Vivek Shankar and Dyanatkar, Sepand and Beltrame, Giovanni},
+  journal={arXiv preprint arXiv:2204.07195},
+  year={2022}
+}
 ```
 
-## Integrate with your tools
+# Brief Approach 
+We propose a method for the control of robot swarms using two subsets of robots: a large group of simple, oblivious robots (which we call the workers) that is governed by simple local attraction forces, and a smaller group (the guides) with sufficient mission knowledge to create and displace a desired worker formation by operating on the local forces of the workers. The guides coordinate to shape the workers like smart particles by changing their interaction parameters.
+ 
 
-- [ ] [Set up project integrations](http://git.mistlab.ca/vvaradharajan/particle_swarm/-/settings/integrations)
+# States in Guide Swarm 
+<table>
+  <tr>
+    <td><font size="5">Separation</td>
+    <td><font size="5">Edge Following</td>
+    <td><font size="5">Shaping Setup</td>
+  </tr>
+  <tr>
+    <td><img src="Images/separation.gif" width=1080 ></td>
+    <td><img src="Images/edge_follow.gif" width=1080></td>
+    <td><img src="Images/shaping_setup.gif" width=1080></td>
+  </tr>
+ </table>
+<table>
+  <tr>
+    <td><font size="5">Shaping</td>
+     <td><font size="5">Movement</td>
+  </tr>
+  <tr>
+    <td><img src="Images/shaping.gif" width=1080></td>
+    <td><img src="Images/movement.gif" width=1080></td>
+  </tr>
+ </table>
 
-## Collaborate with your team
+# Control Parameters of Worker Swarm
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Automatically merge when pipeline succeeds](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+<table>
+  <tr>
+    <td><font size="5">Control Parameters</td>
+    <td><font size="5">Configuring Density</td>
+  </tr>
+  <tr>
+    <td><img src="Images/cp.png" width=1080></td>
+    <td><img src="Images/CP_change.gif" width=1080></td>
+  </tr>
+</table>
 
-## Test and Deploy
+# Robot Behavior scripts
+Robot behavior scripts were developed with [Buzz](https://the.swarming.buzz/) (an extensible programming language for robot swarms). Buzz provides many primitives for programming robot behaviors. We use some of these primitives, like virtual stigmergy, to propagate control parameters across the workers.
+The simulation experiments were performed using the [ARGoS3](https://github.com/ilpincy/argos3) simulator (including the simulations corresponding to the moving plots above) and the [Khepera-IV plugin](https://github.com/ilpincy/argos3-kheperaiv) for ARGoS3.
 
-Use the built-in continuous integration in GitLab.
+# Repository organization 
+```
++-- README.md
++-- Images (Images used in readme)
++-- Simulation (Simulation Experiment scripts)
+|   +-- Convergence_experiments (Convergence of Worker control parameters experiments, fig.5)
+|       +-- batch_scripts (scripts used for batch experimental runs on HPC clusters)
+|       +-- buzz_script (buzz script used for the convergence experiment)
+|       +-- Data_analysis (Notebooks used for data processing and plot generation)
+|       +-- experiments (argos experiment files used for the experiment)
+|       +-- loop_function (argos loop function used for experiment configuration and data logging)
+|   +-- Movement_experiments (Shape formation and movement experimental files)
+|       +-- batch_scripts (scripts used for batch experimental runs on HPC clusters)
+|           +-- launch_job.sh (script to create jobs for the whole experimental set to be run on HPC)
+|           +-- run_job.sh (script to run a single configuration)
+|       +-- buzz_scripts (scripts used for the movement experiments)
+|           +-- Object_movement_test.bzz (Unified script containing the robot behavior for both guides and workers)
+|       +-- data_processing (Notebooks used for data processing and plot generation)
+|       +-- experiments (experimental argos files and simulation configuration)
+|           +-- template.argos (template argos file used by batch script like run_job.sh)
+|           +-- template_exp.argos (an experimental instance that can run locally, use this to start the experiment)
+|       +-- loop_funcs (argos loop function used for experiment configuration, robot placement and data logging)
+|       +-- algorithmPseudocode.txt (Contains the pseudo code of the overall behavior)
+|       +-- edge_following.txt (Contains the pseudo code of the edge following behavior)
+```
+The following instructions assume the user is running a Debian OS (e.g. Ubuntu). 
+The repository was tested on Ubuntu 20
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+## Dependencies 
+ARGoS3 (Multi-robot simulator)
+KheperaIV plugin for ARGoS3
+Buzz (Programming language for Robot swarms)
 
-***
+Follow the following steps to setup the dependencies.
 
-# Editing this README
+TODO
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
+## Testing 
 
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+The following launches an instance of the particle swarm experiment.
+One could change the configuration in the loop function tab of the template_exp.argos to change the experimental configuration.
 
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+```
+cd experiments
+argos3 -c template_exp.argos
+```
