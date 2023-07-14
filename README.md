@@ -265,7 +265,7 @@ movement = {straight diagonal rotation}
 |b| -a|
 |$d_{\rho}$ | 0.8 m|
 |$d_{\delta}$ | 0.45 m|
-|\theta_{\delta}$ | 0.01 rad|
+|$\theta_{\delta}$ | 0.01 rad|
 |$FOV$ | 1 m|
 |$RFOV$ | 0.7 m|
 |$d^e$ | 95|
