@@ -101,7 +101,7 @@ Building the docker container
 ```
 $ git clone https://github.com/MISTLab/Particle_swarm.git
 $ cd Simulation/Docker_files
-$ docker build . --tag particle_swarm
+$ docker build . --tag vivekshankarv/particle_swarm
 ```
 Or you could pull from docker hub
 
