@@ -113,9 +113,16 @@ Testing the simulation
 
 ```
 $ cd Simulation/Docker_files
+$ xhost +local:
 $ ./run_docker.sh
 $ cd /home/docker/Hir/KheperaIV/particle_swarm/Simulation/Movement_experiments/experiments
 $ argos3 -c template_exp.argos
+```
+
+Additional terminal console to the running docker container can be attached using
+
+```
+$ docker exec -it $(docker container ls -q) /bin/bash
 ```
 
 ## Source Setup
