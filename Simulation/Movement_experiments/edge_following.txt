@@ -1,135 +1,28 @@
-
-# -- Dog control.
-switch (Mode):
-    case STANDBY:
-        do nothing
-    case TASK_ALLOCATION:
-        # Populate the structure stigmergy with values for the sheep formation to preserve
-        sendSheepStructure() # TODO Expand/explain inline
-        if 0 >= shaping_time < MAX_TIME_TO_GET_TASK:
-            participateInBidding()
-            if haveTask(myId):
-                shaping_time++
-        else if shaping_time >= MAX_TIME_TO_GET_TASK:
-            if tasksLeft:
-                shaping_time = 0
-            else if not tasksLeft & haveTask(myId):
-                Mode = TO_SHAPE
-                shaping_time = 0
-            else if not tasksLeft & not haveTask(myId):
-                Mode = STAND_BY
-    case TO_SHAPE:
-        if shaping_time == 0:
-            move(repelFromNeighbors(any, SAFE_DIST))
-            if not d(self, anySheep):
-                shaping_time++
-        else if shaping_time == 1:
-            sheepCluster = localizeSheepCluster()
-            move(sheepCluster)
-            if near(sheepCluster):
-                shaping_time++
-            else:
-                move(repelFromNeighbors(isDog, SAFE_DIST))
-        else if shaping_time == 2:
-            edgeFollow() # TODO Expand
-            if near(ShapingPosition): # can be an angle, a relative position from the sheep, anything
-                shaping_time = 1
-                Mode = SHAPING
-    case SHAPED:
-        if shaping_time == 1:
-            if allDogs(READY_TOSHAPE):
-                shaping_time = 2
-        else if shaping_time == 2:
-            sendSheepStructure(Mode = SHAPE)
-            move(ShapeTarget)
-            if near(ShapedPosition):
-                broadcast(DONE)
-            if allDogs(DONE):
-                shaping_time = 0
-                Mode = MOVE
-    case MOVE:
-        if shaping_time < TIME_TO_SETTLE:
-            sendSheepStructure(Mode = LOOSE)
-            shaping_time++
-        else if shaping_time > TIME_TO_SETTLE:
-            # Save initial dog formation to preserve it during motion
-            if initialPositions.empty():
-                initialPositions = dogNeighbors # TODO replace with neighbors.filter(isDog)?
-            sendSheepStructure(Mode = RIGID)
-            if not near(myGoalRelToStart):
-                nearbySheepCOM = getCenterOfMass(sheepNeighbors)
-                goalVec = myGoalRelToStart - myPosition #(relative to start)
-                positionCorrectionVec = getPositionCorrection(initialPositions.distances, dogNeighbors.positions) # TODO Expand/explain
-                angularCorrectionVec = getAngleCorrection(initialPositions.angles, dogNeighbors.angles) # TODO Expand/explain
-                totalMovementVec = goalVec * goalWeight + positionCorrectionVec * positionErrorWeight + angularCorrectionVec * angularErrorWeight
-                move(totalMovementVec)
-
-# -- Sheep structure
-structureStig # received from dogs
-switch TRANSITION:
-    case TO_LOOSE:
-        Mode = LOOSE
-    case TO_SHAPE:
-        Mode = SHAPE
-        # Save initial neighboring sheep to reference in corrections and such
-        initialNeighborSheep = neighbors.filter(distance < structureStig.fieldOfView && isSheep)
-    case TO_RIGID:
-        Mode = RIGID
-        initialNeighborSheep = neighbors.filter(distance < structureStig.fieldOfView && isSheep)
-switch (Mode):
-    case LOOSE:
-        dangerForce = repelFromNeighbors(any, SAFE_DIST)
-        # Try to keep general density with all sheep within Field of View (FOV)
-        sheepForce = repelFromNeighbors(isSheep and d(self, sheep) < structureStig.fov, structureStig.density)
-        # Try to keep general density with all dogs saved from beginning of mode
-        dogForce = repelFromNeighbors(isDog && d(self, nei) < structure.dogReactionDist, structureStig.density) # NOTE it doesn't conserve the doc_reactive_field, but rather density
-        if danger != 0:
-            move(dangerForce)
-        else:
-            totalMovementVec = sheepForce * SHEEP_WEIGHT + dogForce * DOG_WEIGHT
-            move(totalMovementVec)
-    case SHAPE:
-        dangerForce = repelFromNeighbors(any, SAFE_DIST)
-        # Try to keep general density with all sheep neighbors saved from beginning of mode, as long as they are within FOV
-        sheepForce
-        for sheep in neighbors.filter(isSheep):
-            if sheep in initialNeighborSheep and d(self, sheep) < structureStig.fov: # <<-- major difference betwen rigid and shape
-                sheep.push(applyPotential(structureStig.density))
-        dogForce = repelFromNeighbors(isDog && d(self, nei) < structureStig.dogReactionDist, structureStig.density) # NOTE it doesn't conserve the doc_reactive_field, but rather density
-        if danger != 0:
-            move(dangerForce)
-        else:
-            totalMovementVec = sheepForce * SHEEP_WEIGHT + dogForce * DOG_WEIGHT
-            move(totalMovementVec)
-    case RIGID:
-        dangerForce = repelFromNeighbors(any, SAFE_DIST)
-        sheepForce
-        # Try to keep original distances with all sheep neighbors saved from beginning of mode
-        for sheep in neighbors.filter(isSheep):
-            if sheep in initialNeighborSheep:
-                sheep.push(applyPotential(savedSheepInfo.distance))
-
-        if danger != 0:
-            move(dangerForce)
-        else:
-            totalMovementVec = sheepForce * SHEEP_WEIGHT + dogForce * DOG_WEIGHT
-            move(totalMovementVec)
-
-
-
-
-# Apply the potential field, only if within a specified distance of neighbor. Get the total vector sum of the repulsion potentials
-def repelFromNeighbors(filterCondition, distToConserve):
-    if filterCondition == null:
-        filterCondition = true
-    if distToConserve == null:
-        distToConserve = SAFE_DIST
-    neighborsToAvoid = neighbors.filter(filterCondition)
-    accumulatedVector
-    for nei in neighborsToAvoid:
-        if d(self, nei) < distToConserve:
-            accumulatedVector.push(applyPotential(distToConserve))
-    return accumulatedVector
-
-def edgeFollow():
-    # Check edge_following.txt
+-----------------------------------------------------------------------
+Algorithm 1 Edge following algorithm. Current distance (d),
+current neighbor ($N_c$), old neighbor ($N_o$), and current edge (E).
+-----------------------------------------------------------------------
+1:  d=0, $N_c$=0, $N_o$=0
+2:  Last_seen = circular_buffer(10)
+3:  step loop():
+4:      Yield = false
+5:      for each j $\in N_i$ do
+6:          if $\angle x_j < \frac{\pi}{4} $ and $j \in R^G_i$ then
+7:              Yield = true
+8:              break
+9:          end if
+10:         if not in Last_seen and $d_j$ $<$ d and $j \in R^W_i$ then
+11:             $N_c$ = j
+12:             E=j
+13:             if $N_o$ $\neq$ $N_c$ then
+14:                 Last_seen.push back(j)
+15:             end if
+16:         end if
+17:     end for
+18:     if not Yield then
+19:         move_vec$ =\perp x_{N_c}+ (d_{N_c} - d^e) * x_{N_c}$
+20:         goto(move_vec)
+21:     else
+22:         goto($[0,0]^T$)
+23:     end if
+24:     $N_o$ = $N_c$

@@ -454,9 +454,9 @@ function step()
 		# compute_error_broadcast(Accum.error)
 	} # dog robots 
 	else if(ROLE == DOG){
-		log("[",id,"]target size of shapes ", size(target[0].shape_angle), ", ",size(target[0].shape_distance), ",", size(target[0].goal),"x",target[0].goal.x,",",target[0].goal.y  )
-		log("[",id,"]Dogs ", NUM_OF_DOGS_TO_USE)
-		debug.print("Dog state: ", Mode, " shaping_time ", shaping_time, " size ", bidding_stig.size()," time ",  time, " nei ",neighbors.count())
+		# log("[",id,"]target size of shapes ", size(target[0].shape_angle), ", ",size(target[0].shape_distance), ",", size(target[0].goal),"x",target[0].goal.x,",",target[0].goal.y  )
+		# log("[",id,"]Dogs ", NUM_OF_DOGS_TO_USE)
+		# debug.print("Dog state: ", Mode, " shaping_time ", shaping_time, " size ", bidding_stig.size()," time ",  time, " nei ",neighbors.count())
 		var c_target = target[0]
 		# Step 1 Bidding/distributing tasks
 		if(Mode == TASK_ALLOCATION){
@@ -470,29 +470,36 @@ function step()
 				task_stig.put(id,INITALIZED)
 
 				if(m_moveable_state){
+
 					# find the task number under question. 
 					if(bidding_stig.size() > 0){
-						var c_task_Status = bidding_stig.get(bidding_stig.size())
+						var c_task_Status = bidding_stig.get(shape_task_num)
 						if(c_task_Status == -1){
 							# bidding for the current task complete, move on to next
 							shape_task_num = bidding_stig.size()+1
+							bidding_stig.put(shape_task_num, id)
+							
 						}
 						else{
 							# bidding in progress, wait for your assignment time and update bidding if needed.
 							if(id < c_task_Status){
 								shape_task_num = bidding_stig.size()
 								bidding_stig.put(shape_task_num, id)
+								# log("[",id,"] updating bid  my bid ", id, " in stig ", c_task_Status)
+								
 							}
 						}
 					}
 					else{
 						# this is the first task, bid irrespectively 
 						bidding_stig.put(shape_task_num, id)
+						
 					}
 				}
 				else if(bidding_stig.size() == size(c_target.shape_angle)){
 					Mode = STAND_BY
 					shaping_time = 0
+
 					return 0 # REVIEW ?
 				}
 				# log("[", id,"] Movable asking task ", shape_task_num)
@@ -501,17 +508,18 @@ function step()
 			else if(shaping_time > 0 and time - shaping_time < MAX_TIME_TO_FORGET){
 				if(id < bidding_stig.get(shape_task_num) and m_moveable_state){
 					bidding_stig.put(shape_task_num,id)
+
 				}
 			}
 
-			if(time-shaping_time  == MAX_TIME_TO_FORGET){ # REVIEW Why and why use time - shaping_time
+			if(time-shaping_time  >= MAX_TIME_TO_FORGET){ # REVIEW Why and why use time - shaping_time
 				if(id == bidding_stig.get(shape_task_num)){
 					task_stig.put(id,ASSIGNED)
 					bidding_stig.put(shape_task_num,-1)
 					Mode = SHAPE_GOAL
 					Old_error=0
 					shaping_time = 0
-					# log("$$$$$[", id,"] I won task ", shape_task_num)
+					log("$$$$$[", id,"] I won task ", shape_task_num)
 				}
 				else{
 					# If there are more tasks then go for the next task. # TODO Change allocation source/variable
@@ -522,6 +530,8 @@ function step()
 					else if(bidding_stig.size() == size(c_target.shape_angle)){
 						Mode = STAND_BY
 						shaping_time = 0
+						log("[",id,"] No more task, going to standby ")
+
 					}
 				}
 			}

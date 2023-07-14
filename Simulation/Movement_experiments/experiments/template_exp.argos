@@ -63,7 +63,7 @@
     data_size="100"
     density="0.1"
     walls="false"
-    shape="dumbbell"
+    shape="clover"
     movement="straight"
     topology="cluster"
   />
