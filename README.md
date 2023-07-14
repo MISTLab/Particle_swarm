@@ -26,9 +26,9 @@ We propose a method for the control of robot swarms using two subsets of robots:
     <td><font size="5">Shaping Setup</td>
   </tr>
   <tr>
-    <td><img src="Images/separation.gif" width=1080 ></td>
-    <td><img src="Images/edge_follow.gif" width=1080></td>
-    <td><img src="Images/shaping_setup.gif" width=1080></td>
+    <td><img src="Images/separation.gif" width=400 ></td>
+    <td><img src="Images/edge_follow.gif" width=400></td>
+    <td><img src="Images/shaping_setup.gif" width=400></td>
   </tr>
  </table>
 <table>
@@ -37,8 +37,8 @@ We propose a method for the control of robot swarms using two subsets of robots:
      <td><font size="5">Movement</td>
   </tr>
   <tr>
-    <td><img src="Images/shaping.gif" width=1080></td>
-    <td><img src="Images/movement.gif" width=1080></td>
+    <td><img src="Images/shaping.gif" width=400></td>
+    <td><img src="Images/movement.gif" width=400></td>
   </tr>
  </table>
 
@@ -51,7 +51,7 @@ We propose a method for the control of robot swarms using two subsets of robots:
   </tr>
   <tr>
     <td><img src="Images/cp.png" width=1080></td>
-    <td><img src="Images/CP_change.gif" width=1080></td>
+    <td><img src="Images/CP_change.gif" width=400></td>
   </tr>
 </table>
 
